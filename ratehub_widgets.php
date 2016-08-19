@@ -23,101 +23,49 @@ class RateHubWidgetPlugin {
             return $tag . ';' . implode(';', array_keys($attr)) . ';' . implode(';', array_values($attr));
         return $tag;
     }
-    static function chart($attr, $content, $tag) {
-        $ref = self::makeKey($tag, $attr);
-        $params = shortcode_atts(
-            array('series' => '', 'from' => null, 'to' => null, 'hide_legend' => false, 'lang' => 'en'),
-            $attr);
 
-        $url = self::WIDGET_URL . '/chart.php?' . http_build_query($params);
-        $snippet = self::fetchSnippet($url);
-
-        self::$widgets[$ref] = $snippet;
-
-        return $content;
-    }
-
-    static function smallRates($attr, $content, $tag) {
-        $ref = self::makeKey($tag, $attr);
-        $params = shortcode_atts(
-            array('province' => null, 'lang' => 'en'),
-            $attr);
-        $params['snippet']	= 'snippet';
-
-        $url = self::WIDGET_URL . '/rates-small.php?' . http_build_query($params);
-        $snippet = self::fetchSnippet($url);
-
-        self::$widgets[$ref] = $snippet;
-
-        return $content;
-    }
-    static function rateComparison($attr, $content, $tag) {
-        $ref = self::makeKey($tag, $attr);
-        $params = shortcode_atts(
-            array('size' => null, 'purchase' => true, 'lang' => 'en'),
-            $attr);
-        $params['snippet']	= 'snippet';
-
-        $url = self::WIDGET_URL . '/all-rates.php?' . http_build_query($params);
-        $snippet = self::fetchSnippet($url);
-
-        self::$widgets[$ref] = $snippet;
-
-        return $content;
-    }
-    static function paymentCalc($attr, $content, $tag) {
-        $ref = self::makeKey($tag, $attr);
-        $params = shortcode_atts(
-            array('size' => null, 'purchase' => null, 'lang' => 'en'),
-            $attr);
-
-        $url = self::WIDGET_URL . '/payment-calc.php?' . http_build_query($params);
-        $snippet = self::fetchSnippet($url);
-        self::$widgets[$ref] = $snippet;
-
-        return $content;
-    }
-    static function cmhcCalc($attr, $content, $tag) {
-        $ref = self::makeKey($tag, $attr);
-        $params = shortcode_atts(
-            array('size' => null, 'purchase' => null, 'lang' => 'en'),
-            $attr);
-        $params['cmhc']	= 'only';
-        $params['snippet']	= 'snippet';
-
-        $url = self::WIDGET_URL . '/payment-calc.php?' . http_build_query($params);
-        $snippet = self::fetchSnippet($url);
-        self::$widgets[$ref] = $snippet;
-
-        return $content;
-    }
-    static function lttCalc($attr, $content, $tag) {
-        $ref = self::makeKey($tag, $attr);
-        $params = shortcode_atts(
-            array('size' => null, 'purchase' => null, 'lang' => 'en'),
-            $attr);
-        $params['ltt']	= 'only';
-        $params['snippet']	= 'snippet';
-
-        $url = self::WIDGET_URL . '/payment-calc.php?' . http_build_query($params);
-        $snippet = self::fetchSnippet($url);
-        self::$widgets[$ref] = $snippet;
-
-        return $content;
-    }
-    static function compactPayment($attr, $content, $tag) {
+    static function mtgTable($attr, $content, $tag) {
         $ref = self::makeKey($tag, $attr);
         $params = shortcode_atts(
             array('lang' => 'en'),
             $attr);
         $params['snippet']	= 'snippet';
 
-        $url = self::WIDGET_URL . '/compact-payment.php?' . http_build_query($params);
+        $url = self::WIDGET_URL . '/mtg-table.js?' . http_build_query($params);
         $snippet = self::fetchSnippet($url);
         self::$widgets[$ref] = $snippet;
 
         return $content;
     }
+
+    static function paymentCalc($attr, $content, $tag, $type = 'payment') {
+        $ref = self::makeKey($tag, $attr);
+        $params = shortcode_atts(
+            array('lang' => 'en'),
+            $attr);
+        $params['snippet']	= 'snippet';
+
+        if ($type == 'cmhc') {
+            $params['cmhc'] = 'only';
+        }
+        elseif ($type == 'ltt') {
+            $params['ltt']	= 'only';
+        }
+
+        $url = self::WIDGET_URL . '/calc-payment.js?' . http_build_query($params);
+        $snippet = self::fetchSnippet($url);
+        self::$widgets[$ref] = $snippet;
+
+        return $content;
+    }
+
+    static function cmhcCalc($attr, $content, $tag) {
+        return self::paymentCalc($attr, $content, $tag, 'cmhc');
+    }
+    static function lttCalc($attr, $content, $tag) {
+        return self::paymentCalc($attr, $content, $tag, 'ltt');
+    }
+
     static function ccTable($attr, $content, $tag) {
         $ref = self::makeKey($tag, $attr);
         $params = shortcode_atts(
@@ -146,14 +94,10 @@ class RateHubWidgetPlugin {
 
         $post = get_post($postId);
 
-        add_shortcode('ratehub_chart', array('RateHubWidgetPlugin', 'chart'));
-        add_shortcode('ratehub_small', array('RateHubWidgetPlugin', 'smallRates'));
-        add_shortcode('ratehub_comparison', array('RateHubWidgetPlugin', 'rateComparison'));
         add_shortcode('ratehub_payment_calc', array('RateHubWidgetPlugin', 'paymentCalc'));
         add_shortcode('ratehub_cmhc_calc', array('RateHubWidgetPlugin', 'cmhcCalc'));
         add_shortcode('ratehub_ltt_calc', array('RateHubWidgetPlugin', 'lttCalc'));
-        add_shortcode('ratehub_affordability_calc', array('RateHubWidgetPlugin', 'affordabilityCalc'));
-        add_shortcode('ratehub_compact_payment_calc', array('RateHubWidgetPlugin', 'compactPayment'));
+        add_shortcode('ratehub_mortgage_table', array('RateHubWidgetPlugin', 'mtgTable'));
         add_shortcode('ratehub_credit_card_table', array('RateHubWidgetPlugin', 'ccTable'));
 
         do_shortcode($post->post_content);
@@ -162,14 +106,10 @@ class RateHubWidgetPlugin {
     }
 
     static function filterRendered($content) {
-        add_shortcode('ratehub_chart', array('RateHubWidgetPlugin', 'render'));
-        add_shortcode('ratehub_small', array('RateHubWidgetPlugin', 'render'));
-        add_shortcode('ratehub_comparison', array('RateHubWidgetPlugin', 'render'));
         add_shortcode('ratehub_payment_calc', array('RateHubWidgetPlugin', 'render'));
         add_shortcode('ratehub_cmhc_calc', array('RateHubWidgetPlugin', 'render'));
         add_shortcode('ratehub_ltt_calc', array('RateHubWidgetPlugin', 'render'));
-        add_shortcode('ratehub_affordability_calc', array('RateHubWidgetPlugin', 'render'));
-        add_shortcode('ratehub_compact_payment_calc', array('RateHubWidgetPlugin', 'render'));
+        add_shortcode('ratehub_mortgage_table', array('RateHubWidgetPlugin', 'render'));
         add_shortcode('ratehub_credit_card_table', array('RateHubWidgetPlugin', 'render'));
 
         return $content;
