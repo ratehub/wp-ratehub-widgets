@@ -1,15 +1,20 @@
 <?php
 /*
  Plugin Name: RateHub Widgets
- Version: 0.1
- */
+ Description: Provides WordPress shortcodes for RateHub widgets.
+ Version: 1.0
+ Author: RateHub.ca
+ License: GPL2
+ License URI: https://www.gnu.org/licenses/gpl-2.0.html
+*/
 class RateHubWidgetPlugin {
-    const WIDGET_URL = 'http://www.ratehub.ca/widgets';
+    const WIDGET_BASE_URL = 'http://union.ratehub.ca/widgets/';
+    const META_KEY = '_ratehub_widgets';
 
     static $widgets;
 
     static function fetchSnippet($url, $params) {
-        $params['snippet']	= 'snippet';
+        $params['snippet'] = 'snippet';
         $url = "$url?" . http_build_query($params);
 
         if(WP_DEBUG)
@@ -29,41 +34,37 @@ class RateHubWidgetPlugin {
         $params = shortcode_atts(
             array('lang' => 'en'),
             $attr);
-        $params['snippet']	= 'snippet';
 
-        $url = self::WIDGET_URL . '/mtg-table.js?' . http_build_query($params);
-        $snippet = self::fetchSnippet($url);
+        $url = self::WIDGET_BASE_URL.'mtg-table.js';
+        $snippet = self::fetchSnippet($url, $params);
         self::$widgets[$ref] = $snippet;
 
         return $content;
     }
 
-    static function paymentCalc($attr, $content, $tag, $type = 'payment') {
+    static function paymentCalc($attr, $content, $tag) {
         $ref = self::makeKey($tag, $attr);
         $params = shortcode_atts(
-            array('lang' => 'en'),
+            array(
+               'lang' => 'en'
+            ),
             $attr);
-        $params['snippet']	= 'snippet';
+        $params['cmhc'] = ($tag === 'ratehub_cmhc_calc' ? 'only' : null);
+        $params['ltt'] = ($tag === 'ratehub_ltt_calc' ? 'only' : null);
 
-        if ($type == 'cmhc') {
-            $params['cmhc'] = 'only';
-        }
-        elseif ($type == 'ltt') {
-            $params['ltt']	= 'only';
-        }
-
-        $url = self::WIDGET_URL . '/calc-payment.js?' . http_build_query($params);
-        $snippet = self::fetchSnippet($url);
+        $url = self::WIDGET_BASE_URL.'calc-payment.js';
+        $snippet = self::fetchSnippet($url, $params);
         self::$widgets[$ref] = $snippet;
 
         return $content;
     }
 
     static function cmhcCalc($attr, $content, $tag) {
-        return self::paymentCalc($attr, $content, $tag, 'cmhc');
+        return self::paymentCalc($attr, $content, $tag);
     }
+
     static function lttCalc($attr, $content, $tag) {
-        return self::paymentCalc($attr, $content, $tag, 'ltt');
+        return self::paymentCalc($attr, $content, $tag);
     }
 
     static function ccTable($attr, $content, $tag) {
@@ -71,10 +72,9 @@ class RateHubWidgetPlugin {
         $params = shortcode_atts(
             array('lang' => 'en'),
             $attr);
-        $params['snippet']	= 'snippet';
 
-        $url = self::WIDGET_URL . '/cc-table.js?' . http_build_query($params);
-        $snippet = self::fetchSnippet($url);
+        $url = self::WIDGET_BASE_URL.'/cc-table.js';
+        $snippet = self::fetchSnippet($url, $params);
         self::$widgets[$ref] = $snippet;
 
         return $content;
@@ -85,7 +85,7 @@ class RateHubWidgetPlugin {
         $ref = self::makeKey($tag, $attr);
 
         if(empty(self::$widgets))
-            self::$widgets = get_post_meta($post->ID, '_ratehub', true);
+            self::$widgets = get_post_meta($post->ID, self::META_KEY, true);
         return self::$widgets[$ref];
     }
 
@@ -102,7 +102,7 @@ class RateHubWidgetPlugin {
 
         do_shortcode($post->post_content);
 
-        update_post_meta($postId, '_ratehub', self::$widgets);
+        update_post_meta($postId, self::META_KEY, self::$widgets);
     }
 
     static function filterRendered($content) {
