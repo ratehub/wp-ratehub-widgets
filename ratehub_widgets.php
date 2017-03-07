@@ -2,13 +2,13 @@
 /*
  Plugin Name: RateHub Widgets
  Description: Provides WordPress shortcodes for RateHub widgets.
- Version: 1.0
+ Version: 1.0.1
  Author: RateHub.ca
  License: GPL2
  License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 class RateHubWidgetPlugin {
-    const WIDGET_BASE_URL = 'http://union.ratehub.ca/widgets/';
+    const WIDGET_BASE_URL = 'https://www.ratehub.ca/widgets/';
     const META_KEY = '_ratehub_widgets';
 
     static $widgets;
