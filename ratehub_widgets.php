@@ -2,7 +2,7 @@
 /*
  Plugin Name: RateHub Widgets
  Description: Provides WordPress shortcodes for RateHub widgets.
- Version: 1.0.2
+ Version: 1.0.3
  Author: RateHub.ca
  License: GPL2
  License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -13,7 +13,7 @@ class RateHubWidgetPlugin {
 
     static $widgets;
 
-    static $defaultAttributes = [
+    static $defaultAttributes = array(
         'lang' => null,
 
         // affiliate attributes
@@ -29,7 +29,7 @@ class RateHubWidgetPlugin {
         'aff_sub4' => null,
         'aff_sub5' => null,
         'aff_ref' => null
-    ];
+    );
 
     static function fetchSnippet($url, $params) {
         $params['snippet'] = 'snippet';
@@ -117,21 +117,21 @@ class RateHubWidgetPlugin {
         remove_shortcode('ratehub_mortgage_table');
         remove_shortcode('ratehub_credit_card_table');
 
-        add_shortcode('ratehub_payment_calc', ['RateHubWidgetPlugin', 'paymentCalc']);
-        add_shortcode('ratehub_cmhc_calc', ['RateHubWidgetPlugin', 'cmhcCalc']);
-        add_shortcode('ratehub_ltt_calc', ['RateHubWidgetPlugin', 'lttCalc']);
-        add_shortcode('ratehub_mortgage_table', ['RateHubWidgetPlugin', 'mtgTable']);
-        add_shortcode('ratehub_credit_card_table', ['RateHubWidgetPlugin', 'ccTable']);
+        add_shortcode('ratehub_payment_calc', array('RateHubWidgetPlugin', 'paymentCalc'));
+        add_shortcode('ratehub_cmhc_calc', array('RateHubWidgetPlugin', 'cmhcCalc'));
+        add_shortcode('ratehub_ltt_calc', array('RateHubWidgetPlugin', 'lttCalc'));
+        add_shortcode('ratehub_mortgage_table', array('RateHubWidgetPlugin', 'mtgTable'));
+        add_shortcode('ratehub_credit_card_table', array('RateHubWidgetPlugin', 'ccTable'));
 
         do_shortcode($post->post_content);
 
         update_post_meta($postId, self::META_KEY, self::$widgets);
     }
 }
-add_action('save_post', ['RateHubWidgetPlugin', 'filterPosted']);
+add_action('save_post', array('RateHubWidgetPlugin', 'filterPosted'));
 
-add_shortcode('ratehub_payment_calc', ['RateHubWidgetPlugin', 'render']);
-add_shortcode('ratehub_cmhc_calc', ['RateHubWidgetPlugin', 'render']);
-add_shortcode('ratehub_ltt_calc', ['RateHubWidgetPlugin', 'render']);
-add_shortcode('ratehub_mortgage_table', ['RateHubWidgetPlugin', 'render']);
-add_shortcode('ratehub_credit_card_table', ['RateHubWidgetPlugin', 'render']);
+add_shortcode('ratehub_payment_calc', array('RateHubWidgetPlugin', 'render'));
+add_shortcode('ratehub_cmhc_calc', array('RateHubWidgetPlugin', 'render'));
+add_shortcode('ratehub_ltt_calc', array('RateHubWidgetPlugin', 'render'));
+add_shortcode('ratehub_mortgage_table', array('RateHubWidgetPlugin', 'render'));
+add_shortcode('ratehub_credit_card_table', array('RateHubWidgetPlugin', 'render'));
